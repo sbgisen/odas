@@ -190,6 +190,11 @@
                 free((void *) tmpStr2);
 
             }
+            else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
+                tmpStr2 = parameters_lookup_string(fileConfig, "raw.interface.uds_path");
+                cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
+                free((void *) tmpStr2);
+            }
             else if (strcmp(tmpStr1, "soundcard") == 0) {
 
                 tmpInt1 = parameters_lookup_int(fileConfig, "raw.interface.card");
@@ -762,6 +767,11 @@
                 free((void *) tmpStr2);
 
             }
+            else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
+                tmpStr2 = parameters_lookup_string(fileConfig, "ssl.potential.interface.uds_path");
+                cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
+                free((void *) tmpStr2);
+            }
             else if (strcmp(tmpStr1, "terminal") == 0) {
 
                 cfg->interface = interface_construct_terminal();               
@@ -1141,6 +1151,11 @@
                 cfg->interface = interface_construct_socket(tmpStr2, tmpInt1);
                 free((void *) tmpStr2);
 
+            }
+            else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
+                tmpStr2 = parameters_lookup_string(fileConfig, "sst.tracked.interface.uds_path");
+                cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
+                free((void *) tmpStr2);
             }
             else if (strcmp(tmpStr1, "terminal") == 0) {
 
@@ -1824,6 +1839,11 @@
                 free((void *) tmpStr2);
 
             }
+            else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
+                tmpStr2 = parameters_lookup_string(fileConfig, "sss.seperated.interface.uds_path");
+                cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
+                free((void *) tmpStr2);
+            }
             else if (strcmp(tmpStr1, "terminal") == 0) {
 
                 cfg->interface = interface_construct_terminal();               
@@ -1898,6 +1918,11 @@
                 cfg->interface = interface_construct_socket(tmpStr2, tmpInt1);
                 free((void *) tmpStr2);
 
+            }
+            else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
+                tmpStr2 = parameters_lookup_string(fileConfig, "sss.postfiltered.interface.uds_path");
+                cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
+                free((void *) tmpStr2);
             }
             else if (strcmp(tmpStr1, "terminal") == 0) {
 
@@ -2056,6 +2081,11 @@
                 cfg->interface = interface_construct_socket(tmpStr2, tmpInt1);
                 free((void *) tmpStr2);
 
+            }
+            else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
+                tmpStr2 = parameters_lookup_string(fileConfig, "classify.category.interface.uds_path");
+                cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
+                free((void *) tmpStr2);
             }
             else if (strcmp(tmpStr1, "terminal") == 0) {
 

@@ -25,8 +25,10 @@
 
     #include <stdlib.h>
     #include <stdio.h>
+    #include <stddef.h>
     #include <string.h>
     #include <sys/socket.h>
+    #include <sys/un.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #include <unistd.h>
@@ -52,6 +54,9 @@
 
         struct sockaddr_in sserver;
         int sid;
+
+        struct sockaddr_un sserver_un;
+        int sid_un;
 
         msg_tracks_obj * in;
 
@@ -81,6 +86,8 @@
 
     void snk_tracks_open_interface_socket(snk_tracks_obj * obj);
 
+    void snk_tracks_open_interface_unix_domain_socket(snk_tracks_obj * obj);
+
     void snk_tracks_open_interface_terminal(snk_tracks_obj * obj);
 
     void snk_tracks_close(snk_tracks_obj * obj);
@@ -91,6 +98,8 @@
 
     void snk_tracks_close_interface_socket(snk_tracks_obj * obj);
 
+    void snk_tracks_close_interface_unix_domain_socket(snk_tracks_obj * obj);
+
     void snk_tracks_close_interface_terminal(snk_tracks_obj * obj);
 
     int snk_tracks_process(snk_tracks_obj * obj);
@@ -100,6 +109,8 @@
     void snk_tracks_process_interface_file(snk_tracks_obj * obj);
 
     void snk_tracks_process_interface_socket(snk_tracks_obj * obj);
+
+    void snk_tracks_process_interface_unix_domain_socket(snk_tracks_obj * obj);
 
     void snk_tracks_process_interface_terminal(snk_tracks_obj * obj);
 

@@ -25,9 +25,11 @@
 
     #include <stdlib.h>
     #include <stdio.h>
+    #include <stddef.h>
     #include <string.h>
     #include <unistd.h>
     #include <sys/socket.h>
+    #include <sys/un.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
 
@@ -54,6 +56,9 @@
 
         struct sockaddr_in sserver;
         int sid;
+
+        struct sockaddr_un sserver_un;
+        int sid_un;
 
         char bytes[4];
 
@@ -85,6 +90,8 @@
 
     void snk_hops_open_interface_socket(snk_hops_obj * obj);
 
+    void snk_hops_open_interface_unix_domain_socket(snk_hops_obj * obj);
+
     void snk_hops_close(snk_hops_obj * obj);
 
     void snk_hops_close_interface_blackhole(snk_hops_obj * obj);
@@ -93,6 +100,8 @@
 
     void snk_hops_close_interface_socket(snk_hops_obj * obj);
 
+    void snk_hops_close_interface_unix_domain_socket(snk_hops_obj * obj);
+
     int snk_hops_process(snk_hops_obj * obj);
 
     void snk_hops_process_interface_blackhole(snk_hops_obj * obj);
@@ -100,6 +109,8 @@
     void snk_hops_process_interface_file(snk_hops_obj * obj);
 
     void snk_hops_process_interface_socket(snk_hops_obj * obj);
+
+    void snk_hops_process_interface_unix_domain_socket(snk_hops_obj * obj);
 
     void snk_hops_process_format_binary_int08(snk_hops_obj * obj);
 

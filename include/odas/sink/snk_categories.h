@@ -25,9 +25,11 @@
 
     #include <stdlib.h>
     #include <stdio.h>
+    #include <stddef.h>
     #include <string.h>
     #include <unistd.h>
     #include <sys/socket.h>
+    #include <sys/un.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
 
@@ -53,6 +55,9 @@
 
         struct sockaddr_in sserver;
         int sid;
+
+        struct sockaddr_un sserver_un;
+        int sid_un;
 
         msg_categories_obj * in;
 
@@ -82,6 +87,8 @@
 
     void snk_categories_open_interface_socket(snk_categories_obj * obj);
 
+    void snk_categories_open_interface_unix_domain_socket(snk_categories_obj * obj);
+
     void snk_categories_open_interface_terminal(snk_categories_obj * obj);
 
     void snk_categories_close(snk_categories_obj * obj);
@@ -92,6 +99,8 @@
 
     void snk_categories_close_interface_socket(snk_categories_obj * obj);
 
+    void snk_categories_close_interface_unix_domain_socket(snk_categories_obj * obj);
+
     void snk_categories_close_interface_terminal(snk_categories_obj * obj);
 
     int snk_categories_process(snk_categories_obj * obj);
@@ -101,6 +110,8 @@
     void snk_categories_process_interface_file(snk_categories_obj * obj);
 
     void snk_categories_process_interface_socket(snk_categories_obj * obj);
+
+    void snk_categories_process_interface_unix_domain_socket(snk_categories_obj * obj);
 
     void snk_categories_process_interface_terminal(snk_categories_obj * obj);
 

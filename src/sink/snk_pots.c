@@ -41,6 +41,7 @@
               ((obj->interface->type == interface_file)  && (obj->format->type == format_binary_float)) ||
               ((obj->interface->type == interface_file)  && (obj->format->type == format_text_json)) ||
               ((obj->interface->type == interface_socket)  && (obj->format->type == format_text_json)) ||
+              ((obj->interface->type == interface_unix_domain_socket)  && (obj->format->type == format_text_json)) ||
               ((obj->interface->type == interface_terminal) && (obj->format->type == format_text_json)))) {
             
             printf("Sink pots: Invalid interface and/or format.\n");
@@ -105,6 +106,10 @@
 
             break;
 
+            case interface_unix_domain_socket:
+                snk_pots_open_interface_unix_domain_socket(obj);
+            break;
+
             case interface_terminal:
 
                 snk_pots_open_interface_terminal(obj);
@@ -157,6 +162,41 @@
 
     }
 
+    void snk_pots_open_interface_unix_domain_socket(snk_pots_obj * obj) {
+
+        // pid max usually = 32767
+        // to check it, `cat /proc/sys/kernel/pid_max`
+        #define CLI_PATH "/var/tmp/odas/" /* +5 for pid = 19 chars*/
+
+        if((obj->sid_un = socket(AF_UNIX, SOCK_STREAM, 0)) < 0){
+            printf("Sink categories: Cannot create socket client\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // fill socket address stucture with client's address
+        memset(&(obj->sserver_un), 0x00, sizeof(struct sockaddr_un));
+        obj->sserver_un.sun_family = AF_UNIX;
+        sprintf(obj->sserver_un.sun_path, "%s%05d", CLI_PATH, getpid());
+        int len = offsetof(struct sockaddr_un, sun_path) + strlen(obj->sserver_un.sun_path);
+
+        // incase it already exists
+        unlink(obj->sserver_un.sun_path);
+        if (bind(obj->sid_un, (struct sockaddr *) &(obj->sserver_un), len) < 0){
+            printf("Sink categories: Cannot bind clinet socket address\n");
+            close(obj->sid_un);
+            exit(EXIT_FAILURE);
+        }
+
+        // fill socket address structure with server's address
+        memset(&(obj->sserver_un), 0x00, sizeof(struct sockaddr_un));
+        obj->sserver_un.sun_family = AF_UNIX;
+        strcpy(obj->sserver_un.sun_path, obj->interface->uds_path);
+        len = offsetof(struct sockaddr_un, sun_path) + strlen(obj->interface->uds_path);
+        if (connect(obj->sid_un, (struct sockaddr *) &(obj->sserver_un), len) < 0) {
+            printf("Sink categories: Cannot connect to server\n");
+            exit(EXIT_FAILURE);
+        }
+    }
     void snk_pots_open_interface_terminal(snk_pots_obj * obj) {
 
         // Empty
@@ -183,6 +223,10 @@
 
                 snk_pots_close_interface_socket(obj);
                 
+            break;
+
+            case interface_unix_domain_socket:
+                snk_pots_close_interface_unix_domain_socket(obj);
             break;
 
             case interface_terminal:
@@ -217,6 +261,13 @@
     void snk_pots_close_interface_socket(snk_pots_obj * obj) {
 
         close(obj->sid);
+
+    }
+
+
+    void snk_pots_close_interface_unix_domain_socket(snk_pots_obj * obj) {
+
+        close(obj->sid_un);
 
     }
 
@@ -281,6 +332,10 @@
 
                 break;
 
+                case interface_unix_domain_socket:
+                    snk_pots_process_interface_unix_domain_socket(obj);
+                break;
+
                 case interface_terminal:
 
                     snk_pots_process_interface_terminal(obj);
@@ -325,6 +380,14 @@
 
         if (send(obj->sid, obj->buffer, obj->bufferSize, 0) < 0) {
             printf("Sink pots: Could not send message.\n");
+            exit(EXIT_FAILURE);
+        }        
+
+    }
+    void snk_pots_process_interface_unix_domain_socket(snk_pots_obj * obj) {
+
+        if (write(obj->sid_un, obj->buffer, obj->bufferSize) < 0) {
+            printf("Sink pots: Could not send message by uds.\n");
             exit(EXIT_FAILURE);
         }        
 

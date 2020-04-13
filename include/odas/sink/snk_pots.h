@@ -25,8 +25,10 @@
 
     #include <stdlib.h>
     #include <stdio.h>
+    #include <stddef.h>
     #include <string.h>
     #include <sys/socket.h>
+    #include <sys/un.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #include <unistd.h>
@@ -52,6 +54,10 @@
 
         struct sockaddr_in sserver;
         int sid;
+
+        struct sockaddr_un sserver_un;
+        int sid_un;
+
 
         msg_pots_obj * in;
 
@@ -81,6 +87,8 @@
 
     void snk_pots_open_interface_socket(snk_pots_obj * obj);
 
+    void snk_pots_open_interface_unix_domain_socket(snk_pots_obj * obj);
+
     void snk_pots_open_interface_terminal(snk_pots_obj * obj);
 
     void snk_pots_close(snk_pots_obj * obj);
@@ -91,6 +99,8 @@
 
     void snk_pots_close_interface_socket(snk_pots_obj * obj);
 
+    void snk_pots_close_interface_unix_domain_socket(snk_pots_obj * obj);
+
     void snk_pots_close_interface_terminal(snk_pots_obj * obj);
 
     int snk_pots_process(snk_pots_obj * obj);
@@ -100,6 +110,8 @@
     void snk_pots_process_interface_file(snk_pots_obj * obj);
 
     void snk_pots_process_interface_socket(snk_pots_obj * obj);
+
+    void snk_pots_process_interface_unix_domain_socket(snk_pots_obj * obj);
 
     void snk_pots_process_interface_terminal(snk_pots_obj * obj);
 

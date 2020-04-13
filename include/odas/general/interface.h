@@ -35,6 +35,7 @@
         interface_socket = 3,
         interface_soundcard = 4,
         interface_terminal = 5,
+        interface_unix_domain_socket = 6,
 
     } interface_type;
 
@@ -49,6 +50,8 @@
 
         char * deviceName;
 
+        char * uds_path;
+
     } interface_obj;
 
     interface_obj * interface_construct();
@@ -58,6 +61,8 @@
     interface_obj * interface_construct_file(const char * fileName);
 
     interface_obj * interface_construct_socket(const char * ip, const unsigned int port);
+
+    interface_obj * interface_construct_unix_domain_socket(const char * uds_path);
 
     interface_obj * interface_construct_soundcard(const unsigned int card, const unsigned int device);
 

@@ -48,7 +48,11 @@
               ((obj->interface->type == interface_socket)  && (obj->format->type == format_binary_int08)) ||
               ((obj->interface->type == interface_socket)  && (obj->format->type == format_binary_int16)) ||
               ((obj->interface->type == interface_socket)  && (obj->format->type == format_binary_int24)) ||
-              ((obj->interface->type == interface_socket)  && (obj->format->type == format_binary_int32)))) {
+              ((obj->interface->type == interface_socket)  && (obj->format->type == format_binary_int32)) ||
+              ((obj->interface->type == interface_unix_domain_socket)  && (obj->format->type == format_binary_int08)) ||
+              ((obj->interface->type == interface_unix_domain_socket)  && (obj->format->type == format_binary_int16)) ||
+              ((obj->interface->type == interface_unix_domain_socket)  && (obj->format->type == format_binary_int24)) ||
+              ((obj->interface->type == interface_unix_domain_socket)  && (obj->format->type == format_binary_int32)))) {
             
             printf("Sink hops: Invalid interface and/or format.\n");
             exit(EXIT_FAILURE);
@@ -109,6 +113,10 @@
 
             break;
 
+            case interface_unix_domain_socket:
+                snk_hops_open_interface_unix_domain_socket(obj);
+            break;
+
             default:
 
                 printf("Sink hops: Invalid interface type.\n");
@@ -150,9 +158,43 @@
 
             printf("Sink hops: Cannot connect to server\n");
             exit(EXIT_FAILURE);
-
         }          
+    }
 
+    void snk_hops_open_interface_unix_domain_socket(snk_hops_obj * obj) {
+
+        // pid max usually = 32767
+        // to check it, `cat /proc/sys/kernel/pid_max`
+        #define CLI_PATH "/var/tmp/odas/" /* +5 for pid = 19 chars*/
+
+        if((obj->sid_un = socket(AF_UNIX, SOCK_STREAM, 0)) < 0){
+            printf("Sink categories: Cannot create socket client\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // fill socket address stucture with client's address
+        memset(&(obj->sserver_un), 0x00, sizeof(struct sockaddr_un));
+        obj->sserver_un.sun_family = AF_UNIX;
+        sprintf(obj->sserver_un.sun_path, "%s%05d", CLI_PATH, getpid());
+        int len = offsetof(struct sockaddr_un, sun_path) + strlen(obj->sserver_un.sun_path);
+
+        // incase it already exists
+        unlink(obj->sserver_un.sun_path);
+        if (bind(obj->sid_un, (struct sockaddr *) &(obj->sserver_un), len) < 0){
+            printf("Sink categories: Cannot bind clinet socket address\n");
+            close(obj->sid_un);
+            exit(EXIT_FAILURE);
+        }
+
+        // fill socket address structure with server's address
+        memset(&(obj->sserver_un), 0x00, sizeof(struct sockaddr_un));
+        obj->sserver_un.sun_family = AF_UNIX;
+        strcpy(obj->sserver_un.sun_path, obj->interface->uds_path);
+        len = offsetof(struct sockaddr_un, sun_path) + strlen(obj->interface->uds_path);
+        if (connect(obj->sid_un, (struct sockaddr *) &(obj->sserver_un), len) < 0) {
+            printf("Sink categories: Cannot connect to server\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     void snk_hops_close(snk_hops_obj * obj) {
@@ -174,6 +216,12 @@
             case interface_socket:
 
                 snk_hops_close_interface_socket(obj);
+
+            break;
+
+            case interface_unix_domain_socket:
+
+                snk_hops_close_interface_unix_domain_socket(obj);
 
             break;
 
@@ -203,6 +251,12 @@
     void snk_hops_close_interface_socket(snk_hops_obj * obj) {
 
         close(obj->sid);
+
+    }
+    
+	void snk_hops_close_interface_unix_domain_socket(snk_hops_obj * obj) {
+
+        close(obj->sid_un);
 
     }
 
@@ -273,7 +327,13 @@
 
                 break;
 
-                default:
+                case interface_unix_domain_socket:
+
+                    snk_hops_process_interface_unix_domain_socket(obj);
+
+                break;
+                
+				default:
 
                     printf("Sink hops: Invalid interface type.\n");
                     exit(EXIT_FAILURE);
@@ -311,6 +371,14 @@
 
         if (send(obj->sid, obj->buffer, obj->bufferSize, 0) < 0) {
             printf("Sink hops: Could not send message.\n");
+            exit(EXIT_FAILURE);
+        }
+
+    }
+    void snk_hops_process_interface_unix_domain_socket(snk_hops_obj * obj) {
+
+        if (write(obj->sid_un, obj->buffer, obj->bufferSize) < 0) {
+            printf("Sink hops: Could not send message by uds.\n");
             exit(EXIT_FAILURE);
         }
 
