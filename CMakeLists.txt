@@ -219,3 +219,18 @@ target_link_libraries(odasserver
 install(TARGETS odas DESTINATION lib)
 
 
+add_executable(uds_server
+   demo/tools/uds_server.c
+)
+add_executable(uds_client
+   demo/tools/uds_client.c
+)
+add_executable(uds_client_wav2letter
+   demo/tools/uds_client_wav2letter.c
+)
+add_executable(split_multi_channel_raw_audio
+   demo/tools/split_multi_channel_raw_audio.cpp
+)
+add_executable(pick_audio
+   demo/tools/pick_audio.cpp
+)

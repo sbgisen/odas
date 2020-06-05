@@ -10,7 +10,7 @@
 
 #define MAXLINE 1024
 
-char *socket_path = "server.socket";
+char *socket_path = "/data/odas/demo/tools/server.socket";
 
 int main(void){
 
@@ -18,7 +18,7 @@ int main(void){
     socklen_t cli_un_len;
     int listenfd, connfd, size;
     char buf[MAXLINE];
-    int i, n;
+    int n;
 
     if ((listenfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0){
         printf("socket error!\n");
@@ -62,7 +62,7 @@ int main(void){
             printf("received size: %d\n", n);
 
             // send back to client: the first 5 char
-            write(connfd, buf, 5);
+            write(connfd, buf, 1);
             memset(buf, 0x00, sizeof(buf));
         }
         close(connfd);

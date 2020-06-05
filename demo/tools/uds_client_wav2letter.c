@@ -10,10 +10,30 @@
 
 #define CLI_PATH "/var/tmp/odas/"
 
-char * server_path = "/data/odas/demo/tools/server.socket";
+char * server_path = "/data/DATASETS/ASR/wav2letter.socket";
 
-int main(){
+int main(int argc, char** argv){
 
+    printf("Note: Make sure you have the write access to socket: %s \n", server_path);
+
+    // open input file
+    char* fn;
+    if(argc == 1){
+        fn = "out_0.raw";
+    }else if(argc == 2){
+        fn = argv[1];
+    }else{
+        printf("Usage 1: ./uds_client_wav2letter \n ");
+        printf("Usage 2: ./uds_client_wav2letter audio_raw_input_filename.raw \n ");
+    }
+
+    FILE* in_f = fopen(fn, "rb");
+    if(in_f == NULL){
+        printf("open %s failed\n", fn);
+        exit(-1);
+    }
+
+    // unix domain socket
     struct sockaddr_un cli_un, ser_un;
     int len;
     char buf[MAXLINE];
@@ -34,7 +54,6 @@ int main(){
     unlink(cli_un.sun_path);
     if (bind(sockfd, (struct sockaddr *) &cli_un, len) < 0){
         printf("bind error\n");
-        printf("try to check %s\n", CLI_PATH);
         exit(1);
     }
 
@@ -47,20 +66,19 @@ int main(){
         exit(1);
     }
 
-    while(fgets(buf, MAXLINE, stdin) != NULL){
-        write(sockfd, buf, strlen(buf));
-        n = read(sockfd, buf_get, MAXLINE);
-        if (n < 0){
-            printf("the other side has been closed.\n");
-        }else if(n == 0){
-            printf("get nothing!\n");
-        }else{
-            write(STDOUT_FILENO, buf_get, n);
-            write(STDOUT_FILENO, "\n", 1);
-        }
-        memset(buf_get, 0x00, sizeof(buf_get));
+    // write into socket 
+    size_t block_size = 0;
+    while((block_size = fread(buf, sizeof(char), MAXLINE, in_f)) > 0){
+        printf("read %ld from file %s\n", block_size, fn);
+        int n = write(sockfd, buf, block_size);
+        printf("write %d into socket %s\n", n, server_path);
+        
+        memset(buf_get, 0x00, sizeof(block_size));
     }
     close(sockfd);
+
+    fclose(in_f);
+
     return 0;
 
 }
