@@ -1840,7 +1840,7 @@
 
             }
             else if (strcmp(tmpStr1, "unix_domain_socket") == 0){
-                tmpStr2 = parameters_lookup_string(fileConfig, "sss.seperated.interface.uds_path");
+                tmpStr2 = parameters_lookup_string(fileConfig, "sss.separated.interface.uds_path");
                 cfg->interface = interface_construct_unix_domain_socket(tmpStr2);
                 free((void *) tmpStr2);
             }
