@@ -17,8 +17,9 @@
 
 #define MAXLINE 1024
 
-//char *socket_path = "/data/odas/demo/tools/server.socket";
-const char *socket_path = "/data/odas/demo/tools/server_tracks.socket";
+//const char *socket_path = "/data/odas/demo/tools/server.socket";
+//const char *socket_path = "/data/odas/demo/tools/server_tracks.socket";
+const char *socket_path = "/data/DATASETS/ASR/wav2letter_sst.socket";
 
 int main(void){
 
@@ -68,7 +69,12 @@ int main(void){
             }else if(n == 0){
                 printf("EOF\n");
                 break;
+            }else{
+                printf("recieved %d\n", n);
             }
+
+            printf("%s", buf);
+
             std::string str_tmp = std::string(buf);
             v.push_back(str_tmp);
             

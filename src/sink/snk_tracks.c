@@ -381,7 +381,9 @@
     }
     void snk_tracks_process_interface_unix_domain_socket(snk_tracks_obj * obj) {
 
-        if (write(obj->sid_un, obj->buffer, obj->bufferSize) < 0) {
+        // for uds, we write fixed length data, for connienvence.
+        //if (write(obj->sid_un, obj->buffer, obj->bufferSize) < 0) {
+        if (write(obj->sid_un, obj->buffer, 1024) < 0) {
             printf("Sink tracks: Could not send message by uds.\n");
             exit(EXIT_FAILURE);
         }  
@@ -429,7 +431,10 @@
         sprintf(obj->buffer,"%s}\n",obj->buffer);
 
         obj->bufferSize = strlen(obj->buffer);
-
+        if(obj->bufferSize < 1024){
+            obj->buffer[obj->bufferSize] = '\0';
+        }
+        
     }
 
     void snk_tracks_process_format_undefined(snk_tracks_obj * obj) {

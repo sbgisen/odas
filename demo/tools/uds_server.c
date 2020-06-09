@@ -11,6 +11,7 @@
 #define MAXLINE 1024
 
 char *socket_path = "/data/odas/demo/tools/server.socket";
+//char *socket_path = "/data/odas/demo/tools/server_tracks.socket";
 
 int main(void){
 
@@ -62,7 +63,7 @@ int main(void){
             printf("received size: %d\n", n);
 
             // send back to client: the first 5 char
-            write(connfd, buf, 1);
+            //write(connfd, buf, 1);
             memset(buf, 0x00, sizeof(buf));
         }
         close(connfd);

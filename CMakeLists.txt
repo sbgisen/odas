@@ -231,6 +231,11 @@ add_executable(uds_client_wav2letter
 add_executable(split_multi_channel_raw_audio
    demo/tools/split_multi_channel_raw_audio.cpp
 )
-add_executable(pick_audio
-   demo/tools/pick_audio.cpp
+add_executable(UDSReaderTest
+   demo/tools/UDSReaderTest.cpp
+   demo/tools/UDSReader.cpp
+)
+target_include_directories(UDSReaderTest
+    PRIVATE
+    ${CMAKE_CURRENT_DIR}/"demo/tools"
 )
